@@ -6,7 +6,7 @@ tags: Jekyll
 はてなブログから退避したくなった理由は以下。
 
 - データの持ち方及びデプロイサービスとして長期視点で依存するにはやや安定性が低い
-  - 入力は markdown だが export は MovableType という形式に限られる..!
+  - 入力は markdown だが export は MovableType という形式に限られる
 - しっくりくるテーマがなく、自前でスタイルを調整するのも面倒...となっていた
 
 移行先として Jekyll on Github Pages を選定した理由は以下。
@@ -17,14 +17,18 @@ tags: Jekyll
   - データの持ち方として、markdown なら汎用性が十分に高い
   - スタイルもかなり選択肢が多い/自由度が高い、というか minima で十分しっくりくる
 
-MovableType 形式の post を marddown に移し替えるのが面倒だった。
+[k-tokitoh/k-tokitoh.github.io](https://github.com/k-tokitoh/k-tokitoh.github.io)
 
-次の職場で python を書くので、練習としてスクリプトを書いてみた。
+---
+
+はてなから export した MovableType 形式の post を marddown に移し替えるのが手間だなーとなった。
+
+次の職場で python を書くので、練習がてらスクリプトを書いてみた。
 
 ハイライトは以下。
 
-- generator というのを初めて書いてみた
-  - 今回程度のデータ量であれば一気にメモリに載せても全然大丈夫だが。
+- generator というのを初めて書いた
+  - 今回程度のデータ量であれば一気にメモリに載せても全然大丈夫だが
 - 元ファイルの post 間のデリミタが 2 行であり、iterator に状態を保持させた方がすっきり書けそうだった
   - "Effective Python"の項目 38 に書いてあったやつだ！となり、`__call__()`メソッドをもつ class として記述してみた
 
