@@ -61,8 +61,6 @@ dir_to = sys.argv[2]
 
 
 class Meta:
-    __attrs = {"DATE", "TITLE", "STATUS"}
-
     def __init__(self, raw):
         rows = raw.split("\n")
         self.__rows_dict = defaultdict(lambda: None)
@@ -76,18 +74,15 @@ class Meta:
             else:
                 self.__rows_dict[key] = value
 
-        for attr in self.__attrs:
-            self.__setattr__(attr, self.__rows_dict.get(attr))
-
         self.date = self.__convert_date(self.__rows_dict["DATE"])
-        self.title = self.__escape_title(self.__rows_dict["TITLE"])
+        self.title = self.__unescape_title(self.__rows_dict["TITLE"])
         self.status = self.__rows_dict["STATUS"]
         self.tags = self.__rows_dict["CATEGORY"] if self.__rows_dict["CATEGORY"] else []
 
     def __convert_date(self, date_raw):
         return datetime.strptime(date_raw, "%m/%d/%Y %H:%M:%S")
 
-    def __escape_title(self, title_raw):
+    def __unescape_title(self, title_raw):
         return sax.saxutils.unescape(title_raw, {"&#39;": "'", "&quot;": '\\"'})
 
 
@@ -108,7 +103,6 @@ class Post:
             r"\1",
             body,
         )
-
         return self.__sneak_iframe(body, lambda body: HTML2Text().handle(body))
 
     def __sneak_iframe(self, body, func):
@@ -149,20 +143,20 @@ class Post:
 
 class PostIter:
     def __init__(self, file):
-        self.file = file
-        self.flag = False
-        self.str = ""
+        self.__file = file
+        self.__flag = False
+        self.__str = ""
 
     def __call__(self):
-        for row in f:
-            if not self.flag:
-                self.flag = row == "-----\n"
-            if self.flag & (row == "--------\n"):
-                str = self.str.rstrip("-\n")
+        for row in self.__file:
+            if not self.__flag:
+                self.__flag = row == "-----\n"
+            if self.__flag & (row == "--------\n"):
+                str = self.__str.rstrip("-\n")
                 yield Post(str)
-                self.str = ""
-                self.flag = False
-            self.str += row
+                self.__str = ""
+                self.__flag = False
+            self.__str += row
 
 
 with open(file_path_from, "r") as f:
