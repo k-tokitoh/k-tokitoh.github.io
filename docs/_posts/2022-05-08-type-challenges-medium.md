@@ -146,14 +146,62 @@ type TupleToUnion<T extends unknown[]> = T[number];
 
 ## [absolute](https://github.com/type-challenges/type-challenges/blob/main/questions/00529-medium-absolute/README.md)
 
+数値の加減乗除はできないので 0 に対する加減算でふつうに絶対値を取得することはできないな。
+
+再帰の回数で数値をインクリメントすることはできるけど、それでは負の値は扱えないな。
+
+設問条件やテストケースから察するに、文字列のパターンマッチでいけばよさそう。
+
+パターンマッチはテンプレートリテラルと infer の組み合わせでできる。
+
 ```typescript
-// todo
+type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer A}`
+  ? A
+  : `${T}`;
 ```
 
 ## [string to union](https://github.com/type-challenges/type-challenges/blob/main/questions/00531-medium-string-to-union/README.md)
 
+これは仕様で、テンプレートリテラルの中で infer を複数連続して用いると、最後以外は一文字ずつバインド、最後に infer された型変数に残りの文字列全体がバインドされるらしい。
+
 ```typescript
-// todo
+type First<T extends string> = T extends `${infer F}${infer S}${infer R}`
+  ? F
+  : never;
+type Second<T extends string> = T extends `${infer F}${infer S}${infer R}`
+  ? S
+  : never;
+type Rest<T extends string> = T extends `${infer F}${infer S}${infer R}`
+  ? R
+  : never;
+
+type first = First<"hello">; // "h"
+type second = Second<"hello">; // "e"
+type rest = Rest<"hello">; // "llo"
+```
+
+文字列が短い場合にはどうなるか。
+
+```typescript
+type first_of_he = First<"he">; // "h"
+type second_of_he = Second<"he">; // "e"
+type rest_of_he = Rest<"he">; // ""
+
+type first_of_h = First<"h">; // never
+type second_of_h = Second<"h">; // never
+type rest_of_h = Rest<"h">; // never
+```
+
+空文字の infer が成り立てば空文字を infer する。空文字の infer さえ成り立たないと割り当て不可能という判定になる。
+
+この性質を利用して一文字ずつ取り出しして、再帰的に union でがっちゃんこしていけばよい。
+
+```typescript
+type StringToUnion<T extends string> = StringToUnionBase<T, never>;
+type StringToUnionBase<
+  T extends string,
+  U extends string
+> = T extends `${infer F}${infer R}` ? StringToUnionBase<R, U | F> : U;
 ```
 
 ## [merge](https://github.com/type-challenges/type-challenges/blob/main/questions/00599-medium-merge/README.md)
@@ -531,9 +579,34 @@ type GreaterThanBase<
 
 ## [join](https://github.com/type-challenges/type-challenges/blob/main/questions/05310-medium-join/README.md)
 
+一発で join した型を得ることはできなそうなので再帰でやる。
+
 ```typescript
-// todo
+type Delimiter = string | number;
+type Join<T extends string[], D extends Delimiter> = T extends [
+  infer F,
+  ...infer R
+]
+  ? F extends string
+    ? R extends string[]
+      ? JoinBase<R, D, F>
+      : never
+    : never
+  : never;
+type JoinBase<
+  T extends string[],
+  D extends Delimiter,
+  A extends string
+> = T extends [infer F, ...infer R]
+  ? F extends string
+    ? R extends string[]
+      ? JoinBase<R, D, `${A}${D}${F}`>
+      : never
+    : never
+  : A;
 ```
+
+F, R を infer したときにそれぞれ`string`, `string[]`と推論してくれないようなので追って extends で確かめることで再帰呼び出しを可能にした。
 
 ## [last index of](https://github.com/type-challenges/type-challenges/blob/main/questions/05317-medium-lastindexof/README.md)
 
