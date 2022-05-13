@@ -63,13 +63,13 @@ type TupleToUnion<T extends unknown[]> = T[number];
 ## [last of array](https://github.com/type-challenges/type-challenges/blob/main/questions/00015-medium-last/README.md)
 
 ```typescript
-// todo
+type Last<T extends unknown[]> = T extends [...infer R, infer L] ? L : never;
 ```
 
 ## [pop](https://github.com/type-challenges/type-challenges/blob/main/questions/00016-medium-pop/README.md)
 
 ```typescript
-// todo
+type Pop<T extends unknown[]> = T extends [...infer R, infer L] ? R : never;
 ```
 
 ## [promise all](https://github.com/type-challenges/type-challenges/blob/main/questions/00020-medium-promise-all/README.md)
@@ -86,14 +86,58 @@ type TupleToUnion<T extends unknown[]> = T[number];
 
 ## [trim left](https://github.com/type-challenges/type-challenges/blob/main/questions/00106-medium-trimleft/README.md)
 
+最初の文字が空白ならそれを取り除いて再帰的に呼び出す、最初の文字が空白でなくなった時点でその文字列を返す。
+
 ```typescript
-// todo
+type WhiteSpace = " " | "\n" | "\t";
+type TrimLeft<S extends string> = S extends `${infer F}${infer R}`
+  ? F extends WhiteSpace
+    ? TrimLeft<R>
+    : S
+  : "";
 ```
 
 ## [trim](https://github.com/type-challenges/type-challenges/blob/main/questions/00108-medium-trim/README.md)
 
+infer で最初のを取り出すのは、配列型でも string でもできる。
+
 ```typescript
-// todo
+type FirstOfArray<T extends unknown[]> = T extends [infer F, ...infer R]
+  ? F
+  : never;
+type A = FirstOfArray<["a", "b", "c"]>; // "a"
+
+type FirstOfString<T extends string> = T extends `${infer F}${infer R}`
+  ? F
+  : never;
+type X = FirstOfString<"xyz">; // "x"
+```
+
+しかし最後のを取り出すのは、配列型ではできるが、string ではできない。
+
+```typescript
+type LastOfArray<T extends unknown[]> = T extends [...infer R, infer L] ? L : never
+type C = LastOfArray<["a", "b", "c"]>  // "c"
+
+type LastOfString<T extends string> = T extends `${...infer R}, ${infer L}` ? L : never  // error
+```
+
+それゆえ TrimLeft と対象に TrimRight を定義することはできなかった。
+
+文字列をひっくり返すことはできそうなので、TrimLeft => Reverse => TrimLeft => Reverse することにした。
+
+```typescript
+type WhiteSpace = " " | "\n" | "\t";
+type Trim<S extends string> = Reverse<TrimLeft<Reverse<TrimLeft<S>>>>;
+type TrimLeft<S extends string> = S extends `${infer F}${infer R}`
+  ? F extends WhiteSpace
+    ? TrimLeft<R>
+    : S
+  : "";
+type Reverse<
+  S extends string,
+  A extends string = ""
+> = S extends `${infer F}${infer R}` ? Reverse<R, `${F}${A}`> : A;
 ```
 
 ## [capitalize](https://github.com/type-challenges/type-challenges/blob/main/questions/00110-medium-capitalize/README.md)
@@ -390,7 +434,7 @@ type KebabCaseBase<
 
 最初 union を配列に置き換えて length とるとか？ と思ったけど、そういう回答例は見当たらなくて以下。
 
-union の場合にのみ union distribution が発生することを利用する。
+union の場合にのみ union distribution が発生することを利用する。テクいな...。
 
 ```typescript
 type IsUnion<T> = IsUnionBase<T, T>;
@@ -401,19 +445,19 @@ type IsUnionBase<T, C> = T extends infer TN
   : never;
 ```
 
-T が`string|number`なら TN には`string`, `number`がそれぞれ分配してバインドされる。
+T が`string | number`なら TN には`string`, `number`がそれぞれ分配してバインドされる。
 
-これらが元の`string|number`と一致しないということを炙り出したい。
+これらが元の`string | number`と一致しないということを炙り出したい。
 
-`TN extends C`だと一致しないけど割り当て可能と判定されてしまうので、TN(`string`)を extends の右側、C(`string|number`)を extends の左側に書くことに注意する。
+`TN extends C`だと一致しないけど割り当て可能と判定されてしまうので、TN(`string`)を extends の右側、C(`string | number`)を extends の左側に書くことに注意する。
 
-しかしシンプルに`C extends TN`と書くと C(`string|number`)が分配されてしまい、
+しかしシンプルに`C extends TN`と書くと C(`string | number`)が分配されてしまい、
 
 ```typescript
 string extends string ? true : false | number extends string ? true : false
 ```
 
-すなわち`true|false`を返してしまう。
+すなわち`true | false`を返してしまう。
 
 これを避けるために`C extends TN`ではなく`[C] extends [TN]`としてあげれば完成。
 
@@ -622,6 +666,8 @@ type be0 = BE<"b", ["e1", "e2"]>; //  "b__e1" | "b__e2"
 type be1 = BE<"b", []>; // "b"
 ```
 
+続いて M も。これで完成。
+
 ```typescript
 type BEM<
   B extends string,
@@ -635,8 +681,6 @@ type BEM<
   ? `${B}__${E[number]}`
   : `${B}__${E[number]}--${M[number]}`;
 ```
-
-これで完成。
 
 ## [in order traversal](https://github.com/type-challenges/type-challenges/blob/main/questions/03376-medium-inordertraversal/README.md)
 
@@ -826,7 +870,30 @@ type JoinBase<
   : A;
 ```
 
-F, R を infer したときにそれぞれ`string`, `string[]`と推論してくれないようなので追って extends で確かめることで再帰呼び出しを可能にした。
+F, R を infer したときにそれぞれ`string`, `string[]`と推論してくれないようなので追って extends で推論させることで再帰呼び出しを可能にした。
+
+unknown とかをつかったら以下のとおり少し減らせたけど、多少は extends で型を推論させることが必要と思われる。
+
+```typescript
+type Delimiter = string | number;
+type Join<T extends unknown[], D extends Delimiter> = T extends [
+  infer F,
+  ...infer R
+]
+  ? F extends string
+    ? JoinBase<R, D, F>
+    : never
+  : never;
+type JoinBase<
+  T extends unknown[],
+  D extends Delimiter,
+  A extends string
+> = T extends [infer F, ...infer R]
+  ? F extends string
+    ? JoinBase<R, D, `${A}${D}${F}`>
+    : never
+  : A;
+```
 
 ## [last index of](https://github.com/type-challenges/type-challenges/blob/main/questions/05317-medium-lastindexof/README.md)
 
