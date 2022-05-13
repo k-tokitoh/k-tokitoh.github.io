@@ -212,9 +212,161 @@ type StringToUnionBase<
 
 ## [kebab case](https://github.com/type-challenges/type-challenges/blob/main/questions/00612-medium-kebabcase/README.md)
 
+template literals & infer で一文字ずつとりだして大文字ならハイフンと小文字に置き換えて accumulator として置換後の文字列を伸ばしていけばいい。
+
+大文字の判定なんて便利なものはないので、大文字の union に対する割り当て可能性で判定するしかないだろう。
+
+置換はどうするか？ 別の問題で index を求めるのがあったので、upper/lower それぞれを 26 要素の配列型にしておき、大文字の配列型における index を求めて、小文字の配列型に index signature でアクセスすればよさそう。
+
 ```typescript
-// todo
+type Upper = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
+];
+type Lower = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z"
+];
+type KebabCase<S extends string> = S extends `${infer F}${infer R}`
+  ? F extends Upper[number]
+    ? KebabCaseBase<R, `${ToLower<F>}`>
+    : KebabCaseBase<R, `${F}`>
+  : "";
+type KebabCaseBase<
+  S extends string,
+  A extends string
+> = S extends `${infer F}${infer R}`
+  ? F extends Upper[number]
+    ? KebabCaseBase<R, `${A}-${ToLower<F>}`>
+    : KebabCaseBase<R, `${A}${F}`>
+  : A;
+type ToLower<S extends Upper[number]> = Lower[IndexOf<Upper, S>];
+type IndexOf<T extends unknown[], U extends unknown> = IndexOfBase<T, U, []>;
+type IndexOfBase<T, U, Counter extends null[]> = T extends [infer F, ...infer R]
+  ? Equal<F, U> extends true
+    ? Counter["length"]
+    : IndexOfBase<R, U, [...Counter, null]>
+  : -1;
 ```
+
+という感じで自力クリアしたけど、他の回答みたら Record つかえばこんなややこしいことしないで済むと気づいた...。
+
+```typescript
+type Mapper = {
+  A: "a";
+  B: "b";
+  C: "c";
+  D: "d";
+  E: "e";
+  F: "f";
+  G: "g";
+  H: "h";
+  I: "i";
+  J: "j";
+  K: "k";
+  L: "l";
+  M: "m";
+  N: "n";
+  O: "o";
+  P: "p";
+  Q: "q";
+  R: "r";
+  S: "s";
+  T: "t";
+  U: "u";
+  V: "v";
+  W: "w";
+  X: "x";
+  Y: "y";
+  Z: "z";
+};
+
+type KebabCase<S extends string> = S extends `${infer F}${infer R}`
+  ? F extends keyof Mapper
+    ? KebabCaseBase<R, `${ToLower<F>}`>
+    : KebabCaseBase<R, `${F}`>
+  : "";
+type KebabCaseBase<
+  S extends string,
+  A extends string
+> = S extends `${infer F}${infer R}`
+  ? F extends keyof Mapper
+    ? KebabCaseBase<R, `${A}-${ToLower<F>}`>
+    : KebabCaseBase<R, `${A}${F}`>
+  : A;
+type ToLower<S extends keyof Mapper> = Mapper[S];
+```
+
+そしてさらに UpperCase/LowerCase という utility types があるの、知らなかった..!
+
+```typescript
+type KebabCase<S extends string> = S extends `${infer F}${infer R}`
+  ? F extends Lowercase<F>
+    ? KebabCaseBase<R, `${F}`>
+    : KebabCaseBase<R, `${Lowercase<F>}`>
+  : "";
+type KebabCaseBase<
+  S extends string,
+  A extends string
+> = S extends `${infer F}${infer R}`
+  ? F extends Lowercase<F>
+    ? KebabCaseBase<R, `${A}${F}`>
+    : KebabCaseBase<R, `${A}-${Lowercase<F>}`>
+  : A;
+```
+
+注意すべきは以下。
+
+- 大文字/小文字は`C extends Uppercase<C>` or `C extends Lowercase<C>`で判定する訳だが、alphabet 以外は常にこれらが成り立つ
+- よって「`C extends Lowercase<C>`が成り立つ小文字と記号は置換しない、成り立たない文字=大文字を置換する」という処理にする
 
 ## [diff](https://github.com/type-challenges/type-challenges/blob/main/questions/00645-medium-diff/README.md)
 
@@ -303,14 +455,22 @@ string extends string ? true : false | number extends string ? true : false
 
 ## [starts with](https://github.com/type-challenges/type-challenges/blob/main/questions/02688-medium-startswith/README.md)
 
+template literals と infer を用いたマッチングで素直にできる。
+
 ```typescript
-// todo
+type StartsWith<T extends string, U extends string> = T extends `${U}${infer R}`
+  ? true
+  : false;
 ```
 
 ## [ends with](https://github.com/type-challenges/type-challenges/blob/main/questions/02693-medium-endswith/README.md)
 
+starts with と同様。
+
 ```typescript
-// todo
+type EndsWith<T extends string, U extends string> = T extends `${infer R}${U}`
+  ? true
+  : false;
 ```
 
 ## [partial by keys](https://github.com/type-challenges/type-challenges/blob/main/questions/02757-medium-partialbykeys/README.md)
@@ -561,8 +721,59 @@ type GreaterThanBase<
 
 ## [without](https://github.com/type-challenges/type-challenges/blob/main/questions/05117-medium-without/README.md)
 
+配列の型を一気に得ることはできないので、どれかの配列をベースにして再帰的に組み立てる必要がある。
+
+型引数を T, U とした場合、
+
+- U を回すと、「この要素を T からすべて除く」操作が必要だが、それはできなさそう
+- T を回すと、「この要素が U に含まれていたら除く」操作が必要、それはできそう
+
 ```typescript
-// todo
+type Without<
+  T extends number[],
+  U extends number | number[]
+> = U extends number[]
+  ? WithoutBase<T, U[number], []>
+  : U extends number
+  ? WithoutBase<T, U, []>
+  : never;
+type WithoutBase<
+  T extends number[],
+  U extends number,
+  V extends number[]
+> = T extends [infer F, ...infer R]
+  ? F extends U
+    ? R extends number[]
+      ? WithoutBase<R, U, V>
+      : never
+    : R extends number[]
+    ? F extends number
+      ? WithoutBase<R, U, [...V, F]>
+      : never
+    : never
+  : V;
+```
+
+`number | number[]`を`extends number`で分岐したときに、割り当て不可能な方を`number[]`と推論してくれないみたい。
+
+なのでそういう箇所で conditional type を再度書いて推論を効かせるということをたくさんやる羽目になってしまった。
+
+どうも`unknown | unknown[]`にしているとこの問題は回避できるらしい。仕様？
+
+```typescript
+type Without<
+  T extends unknown[],
+  U extends unknown | unknown[]
+> = U extends unknown[] ? WithoutBase<T, U[number], []> : WithoutBase<T, U, []>;
+type WithoutBase<
+  T extends unknown[],
+  U extends unknown,
+  V extends unknown[]
+> = T extends [infer F, ...infer R]
+  ? F extends U
+    ? WithoutBase<R, U, V>
+    : WithoutBase<R, U, [...V, F]>
+  : V;
 ```
 
 ## [trunc](https://github.com/type-challenges/type-challenges/blob/main/questions/05140-medium-trunc/README.md)
@@ -573,8 +784,17 @@ type GreaterThanBase<
 
 ## [index of](https://github.com/type-challenges/type-challenges/blob/main/questions/05153-medium-indexof/README.md)
 
+一発で配列の中身を走査することはできないので、再帰で回す方針とする。
+
+index を出力するために、呼び出しごとに値をインクリメントする必要がある。しかし値を+1 することはできないので、代わりに配列型を用意して要素をひとつずつ追加していき、一致する要素がみつかった時点でその配列型の length を返す。
+
 ```typescript
-// todo
+type IndexOf<T extends unknown[], U extends unknown> = IndexOfBase<T, U, []>;
+type IndexOfBase<T, U, Counter extends null[]> = T extends [infer F, ...infer R]
+  ? Equal<F, U> extends true
+    ? Counter["length"]
+    : IndexOfBase<R, U, [...Counter, null]>
+  : -1;
 ```
 
 ## [join](https://github.com/type-challenges/type-challenges/blob/main/questions/05310-medium-join/README.md)
