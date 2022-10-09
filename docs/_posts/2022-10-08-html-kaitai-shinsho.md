@@ -3,6 +3,10 @@ title: 『HTML 解体新書』
 tags: html books
 ---
 
+<a target="_blank" href="https://www.amazon.co.jp/HTML%E8%A7%A3%E4%BD%93%E6%96%B0%E6%9B%B8-%E4%BB%95%E6%A7%98%E3%81%8B%E3%82%89%E7%B4%90%E8%A7%A3%E3%81%8F%E6%9C%AC%E6%A0%BC%E5%85%A5%E9%96%80-%E5%A4%AA%E7%94%B0-%E8%89%AF%E5%85%B8/dp/4862465277">
+  <img src="https://m.media-amazon.com/images/I/81P9-Xhy06L.jpg" width="200px" />
+</a>
+
 以下の理由から読んだ。
 
 - web のこと知らなさすぎるなあ、という課題感があった
@@ -10,7 +14,7 @@ tags: html books
     - 体系的にまとまったものをさらってみたい
     - 必要に応じてオリジナルの仕様を読む体力つけられたらいいな
   - 特にアクセシビリティのこと alt 属性くらいしか知らないけど、どうも大事らしい
-- uhyo さんが高評価してた
+- [uhyo さんが高評価してた](https://blog.uhy.ooo/entry/2022-05-05/html-kaitai-shinsho/)
 
 知ったことなどをメモ。
 
@@ -153,3 +157,5 @@ tags: html books
 (...to be written)
 
 ## chapter 4. 主要な属性と WAI-ARIA
+
+<input type="hidden" id="ASIN" name="ASIN" value="4862465277">
