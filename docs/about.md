@@ -4,12 +4,6 @@ title: About
 permalink: /about/
 ---
 
-# personal information
-
-Takashi Suzuki
-
-[GitHub](https://github.com/k-tokitoh)
-
 # jobs
 
 ## 2021/08 - now
