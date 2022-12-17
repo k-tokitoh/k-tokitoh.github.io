@@ -1,6 +1,7 @@
 ---
 title: TypeScriptで `n | n +1 | n+2 | ... | m` みたいな型をつくる
 tags: typescript
+layout: post
 ---
 
 業務中にこういう型があるといいなと思ったのでパズルがてらやってみた。

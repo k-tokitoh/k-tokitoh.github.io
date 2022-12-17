@@ -1,6 +1,7 @@
 ---
 title: システム設計 はじめの一歩
-tags:
+tags: architecture
+layout: post
 ---
 
 # introduction

@@ -1,6 +1,7 @@
 ---
 title: type challenges - warm-up, easy
 tags: typescript
+layout: post
 ---
 
 [type-challenges/type-challenges](https://github.com/type-challenges/type-challenges)
@@ -89,8 +90,8 @@ type MyAwaited<T extends Promise<unknown>> = T extends Promise<infer U>
 しかしこれだとネストが 2 階層までに限定されてしまい、例えば以下がとおらない。
 
 ```typescript
-type N = Promise<Promise<Promise<string>>>
-Expect<Equal<MyAwaited<N>, string>>
+type N = Promise<Promise<Promise<string>>>;
+Expect<Equal<MyAwaited<N>, string>>;
 ```
 
 一番上の階層では型引数に extends を書くことで `MyAwaited<number>` とかを弾きつつ、内側では再帰で書けばより一般的に書けた。
@@ -188,7 +189,9 @@ bar = foo; // エラーにならない
 さてこの性質を利用して型の一致を判定する。
 
 ```typescript
-type Equal_2<X, Y> = (<T>() => T extends X ? 0 : 1) extends (<T>() => T extends Y ? 0 : 1)
+type Equal_2<X, Y> = (<T>() => T extends X ? 0 : 1) extends <T>() => T extends Y
+  ? 0
+  : 1
   ? true
   : false;
 
@@ -203,7 +206,9 @@ type _2_false_2 = Equal_2<0, any>; // false
 一致性をひとつひとつの要素について再帰的に判定していく。
 
 ```typescript
-type MyEqual<X, Y> = (<T>() => T extends X ? 0 : 1) extends (<T>() => T extends Y ? 0 : 1)
+type MyEqual<X, Y> = (<T>() => T extends X ? 0 : 1) extends <T>() => T extends Y
+  ? 0
+  : 1
   ? true
   : false;
 type Includes<T extends readonly unknown[], U> = T extends [infer F, ...infer R]
@@ -228,7 +233,9 @@ type Unshift<T extends unknown[], U> = [U, ...T];
 ## [parameters](https://github.com/type-challenges/type-challenges/blob/main/questions/03312-easy-parameters/README.md)
 
 ```typescript
-type MyParameters<T extends (...args: any[]) => unknown> = T extends (...args: infer Args) => unknown
+type MyParameters<T extends (...args: any[]) => unknown> = T extends (
+  ...args: infer Args
+) => unknown
   ? Args
   : never;
 ```

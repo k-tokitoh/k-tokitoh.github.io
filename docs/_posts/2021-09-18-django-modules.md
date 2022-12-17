@@ -1,6 +1,7 @@
 ---
 title: Djangoのapplications
 tags: Django
+layout: post
 ---
 
 8 月から Django に触り始めて、まだフレームワーク頼みではあるのだが、ようやく Rails を外れた世界をみれている。

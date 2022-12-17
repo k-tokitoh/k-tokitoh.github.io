@@ -1,7 +1,10 @@
 ---
 layout: page
 title: About
-permalink: /about/
+# tagline: A few more words about this theme
+permalink: /about.html
+ref: about
+order: 0
 ---
 
 # jobs

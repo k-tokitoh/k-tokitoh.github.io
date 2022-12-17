@@ -1,6 +1,7 @@
 ---
 title: RxJSのflatteners
 tags: rxjs
+layout: post
 ---
 
 整理する。

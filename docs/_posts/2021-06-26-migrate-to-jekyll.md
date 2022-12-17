@@ -1,6 +1,7 @@
 ---
 title: はてなブログからJekyll on Github Pages に移行した
 tags: Jekyll
+layout: post
 ---
 
 はてなブログから退避したくなった理由は以下。

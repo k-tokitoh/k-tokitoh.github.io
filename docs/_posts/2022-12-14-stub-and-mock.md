@@ -1,6 +1,7 @@
 ---
 title: stub & mock
 tags: testing
+layout: post
 ---
 
 いまさらながら stub とか mock とか、毎回思い出すときにちょっと混乱するのでメモ。
