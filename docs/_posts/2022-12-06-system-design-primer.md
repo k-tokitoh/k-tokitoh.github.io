@@ -8,7 +8,7 @@ tags:
 - アーキテクチャ設計とかできるようになりたいな
 - しかし実戦経験を積む機会は現職だと少ないな
 - 座学は学びが限られるけどやらないよりましだろう
-- [system-design-primer](https://github.com/donnemartin/system-design-primer)とかちょっとみてみるか
+- [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer)とかちょっとみてみるか
 - 読むだけだと頭に残らないのでメモして残しておく
 - あんまり体系的な資料/教材がみあたらないので、つまみぐいスタイルで
 
