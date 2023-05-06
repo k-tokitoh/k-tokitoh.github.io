@@ -4,6 +4,8 @@ tags: architecture
 layout: post
 ---
 
+.
+
 # introduction
 
 - アーキテクチャ設計とかできるようになりたいな
@@ -111,3 +113,58 @@ CAP 理論にでてきた consistency にはいくつかの level がある。
   - O: 複雑性が低い
   - O: （単一サーバの場合）各サーバをステートを保持してもよい
   - O: DB などの集約された箇所でも同時接続数が増えない
+
+# proxy
+
+- forward proxy
+  - client <= forward proxy <= server
+- reserve proxy
+  - client => reverse proxy => server
+
+## reverse proxy
+
+- メリット/使い方
+  - サーバの情報を隠蔽
+    - 堅牢なセキュリティ
+    - スケーリングなどの柔軟性
+  - SSL termination
+  - パフォーマンス
+    - 静的コンテンツ
+    - キャッシング
+    - gzip などの圧縮
+- デメリット
+  - 全般
+    - 複雑性が増す
+  - 単複
+    - 単一の場合
+      - 単一障害点になりうる
+    - 複数の場合
+      - さらに複雑性が増す
+
+load balancer は reverse proxy は重なる部分も多い。
+
+# RDB
+
+## ACID
+
+トランザクションの特性。
+
+- Atomicity
+  - トランザクションは、全て為された or 全て為されていない、いずれかの状態である
+- Consistency
+  - トランザクションの開始/終了時に予め与えられた整合性を満たす
+  - ex. 口座残高は正数である
+- Isolation
+  - トランザクションの途中の状態がトランザクション外部から読み取られることがない
+- Durability
+  - トランザクションが完了したらその状態は失われない
+
+## RDB のスケーリング
+
+### master / slave replication
+
+master は(read/)write に、slave は read に応答する。
+
+### master / master replication
+
+### sharding
