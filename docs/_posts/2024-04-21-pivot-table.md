@@ -1,5 +1,5 @@
 ---
-title: pandasにおける集計チートシート
+title: pandas集計チートシート
 layout: post
 ---
 
@@ -179,7 +179,7 @@ Third    0.500 0.135
 
 ### 特殊系
 
-算出したい割合が 0/1 である場合は `pivot_table()`で mean をとることで簡便に算出できる。
+0/1 の値の割合を算出したい場合は `pivot_table()`で mean をとることで簡便に算出できる。
 
 ```python
 df.pivot_table(index="class", columns="sex", values="survived", aggfunc="mean")
